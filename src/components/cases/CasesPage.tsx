@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { CaseDetailModal } from "./CaseDetailModal";
 import { 
   Plus,
   Search,
@@ -79,6 +80,8 @@ export function CasesPage({ currentUser }: CasesPageProps) {
   const [showNewCaseForm, setShowNewCaseForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
+  const [showCaseDetail, setShowCaseDetail] = useState(false);
 
   const [newCase, setNewCase] = useState({
     name: "",
@@ -119,6 +122,11 @@ export function CasesPage({ currentUser }: CasesPageProps) {
       title: "Case created successfully",
       description: `${caseId} has been created and assigned to you.`,
     });
+  };
+
+  const handleViewDetails = (case_: Case) => {
+    setSelectedCase(case_);
+    setShowCaseDetail(true);
   };
 
   const getStatusColor = (status: string) => {
@@ -324,7 +332,9 @@ export function CasesPage({ currentUser }: CasesPageProps) {
               </div>
 
               <div className="flex space-x-2 pt-2">
-                <Button variant="outline" size="sm" className="flex-1">View Details</Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => handleViewDetails(case_)}>
+                  View Details
+                </Button>
                 <Button variant="outline" size="sm" className="flex-1">Add Evidence</Button>
               </div>
             </CardContent>
@@ -343,6 +353,16 @@ export function CasesPage({ currentUser }: CasesPageProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Case Detail Modal */}
+      <CaseDetailModal
+        case_={selectedCase}
+        isOpen={showCaseDetail}
+        onClose={() => {
+          setShowCaseDetail(false);
+          setSelectedCase(null);
+        }}
+      />
     </div>
   );
 }

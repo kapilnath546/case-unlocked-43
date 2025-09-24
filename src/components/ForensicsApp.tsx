@@ -6,6 +6,8 @@ import { EvidencePage } from "./evidence/EvidencePage";
 import { SearchPage } from "./search/SearchPage";
 import { CasesPage } from "./cases/CasesPage";
 import { ReportsPage } from "./reports/ReportsPage";
+import { UsersPage } from "./users/UsersPage";
+import { SettingsPage } from "./settings/SettingsPage";
 import { toast } from "@/hooks/use-toast";
 
 interface User {
@@ -62,6 +64,10 @@ export function ForensicsApp() {
         return <SearchPage />;
       case "reports":
         return <ReportsPage currentUser={user} />;
+      case "users":
+        return <UsersPage currentUser={user} />;
+      case "settings":
+        return <SettingsPage currentUser={user} />;
       default:
         return <DashboardPage onPageChange={setCurrentPage} />;
     }

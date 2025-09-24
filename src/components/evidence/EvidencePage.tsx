@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { EvidenceDetailModal } from "./EvidenceDetailModal";
 import { 
   Upload, 
   FileText, 
@@ -60,6 +61,8 @@ export function EvidencePage({ currentUser }: EvidencePageProps) {
 
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedEvidence, setSelectedEvidence] = useState<EvidenceFile | null>(null);
+  const [showEvidenceDetail, setShowEvidenceDetail] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const formatFileSize = (bytes: number) => {
@@ -132,6 +135,11 @@ export function EvidencePage({ currentUser }: EvidencePageProps) {
     }
   };
 
+  const handleViewDetails = (evidence: EvidenceFile) => {
+    setSelectedEvidence(evidence);
+    setShowEvidenceDetail(true);
+  };
+
   return (
     <div className="p-6 space-y-6 bg-background min-h-screen">
       {/* Header */}
@@ -167,7 +175,7 @@ export function EvidencePage({ currentUser }: EvidencePageProps) {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".ufdr,.zip,.tar"
+              accept=".ufdr,.e01,.ex01,.dd,.raw,.aff,.vmdk,.zip,.tar,.tar.gz,.7z,.iso,.vhd,.vhdx"
               onChange={handleFileUpload}
               className="hidden"
             />
@@ -182,6 +190,42 @@ export function EvidencePage({ currentUser }: EvidencePageProps) {
               <Progress value={uploadProgress} className="h-2" />
             </div>
           )}
+
+          {/* Supported File Types Information */}
+          <div className="bg-muted/50 rounded-lg p-4">
+            <div className="flex items-center space-x-2 mb-3">
+              <AlertCircle className="h-4 w-4 text-info" />
+              <span className="font-medium text-sm">Supported Evidence File Types</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="font-medium mb-2">Digital Forensics Images:</p>
+                <ul className="text-muted-foreground space-y-1 ml-4">
+                  <li>• UFDR (Universal Forensic Data Request)</li>
+                  <li>• E01/Ex01 (EnCase Image Format)</li>
+                  <li>• DD/RAW (Bit-for-bit copy)</li>
+                  <li>• AFF (Advanced Forensic Format)</li>
+                  <li>• VMDK (Virtual Machine Disk)</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-medium mb-2">Archive & Container Formats:</p>
+                <ul className="text-muted-foreground space-y-1 ml-4">
+                  <li>• ZIP (Compressed archives)</li>
+                  <li>• TAR/TAR.GZ (Unix archives)</li>
+                  <li>• 7Z (7-Zip compressed)</li>
+                  <li>• ISO (Disk images)</li>
+                  <li>• VHD/VHDX (Virtual Hard Disk)</li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-3 p-2 bg-warning/10 border border-warning/20 rounded">
+              <p className="text-xs text-warning-foreground">
+                <strong>Important:</strong> Maximum file size is 10GB. Files larger than 100MB may require extended processing time.
+                All uploaded files are automatically hashed using SHA-256 for integrity verification.
+              </p>
+            </div>
+          </div>
 
           <div className="bg-muted/50 rounded-lg p-4">
             <div className="flex items-center space-x-2 mb-2">
@@ -219,7 +263,7 @@ export function EvidencePage({ currentUser }: EvidencePageProps) {
                   </div>
                   <div className="flex items-center space-x-2">
                     {getStatusBadge(file.status)}
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(file)}>
                       <Eye className="h-4 w-4" />
                     </Button>
                   </div>
@@ -257,7 +301,7 @@ export function EvidencePage({ currentUser }: EvidencePageProps) {
                       <Download className="h-4 w-4 mr-2" />
                       Download
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(file)}>
                       View Details
                     </Button>
                   </div>
@@ -267,6 +311,16 @@ export function EvidencePage({ currentUser }: EvidencePageProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Evidence Detail Modal */}
+      <EvidenceDetailModal
+        evidence={selectedEvidence}
+        isOpen={showEvidenceDetail}
+        onClose={() => {
+          setShowEvidenceDetail(false);
+          setSelectedEvidence(null);
+        }}
+      />
     </div>
   );
 }

@@ -51,6 +51,27 @@ export function ReportsPage({ currentUser }: ReportsPageProps) {
     }, 2000);
   };
 
+  const handleDownloadReport = (reportId: string, format: string) => {
+    // Create a blob with sample content
+    const content = `Investigation Report - ${reportId}\n\nGenerated on: ${new Date().toLocaleString()}\nFormat: ${format}\n\nThis is a sample forensics investigation report.`;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${reportId}_report.${format.toLowerCase()}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Download Started",
+      description: `Report ${reportId} is downloading...`,
+    });
+  };
+
   return (
     <div className="p-6 space-y-6 bg-background min-h-screen">
       <div className="flex items-center justify-between">
@@ -80,7 +101,7 @@ export function ReportsPage({ currentUser }: ReportsPageProps) {
               </div>
               <div className="flex items-center space-x-2">
                 <Badge variant="outline">{report.format}</Badge>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => handleDownloadReport(report.id, report.format)}>
                   <Download className="h-4 w-4" />
                 </Button>
               </div>
